@@ -87,4 +87,11 @@ public class CalculatorTest {
 
         assertEquals(3, result);
     }
+
+    // Step 5
+    @Test
+    void whenNegativeNumbers_thenThrow() {
+        assertThrows(NegativeNumberException.class,
+                () -> calculator.add("-1,2"));
+    }
 }

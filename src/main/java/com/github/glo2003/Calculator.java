@@ -3,6 +3,7 @@ package com.github.glo2003;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Calculator {
@@ -23,6 +24,7 @@ public class Calculator {
         String delimiterRegex = parseDelimiters(delimiterSection);
 
         List<Integer> parsedNumbers = parseNumbers(body, delimiterRegex);
+        checkNegativeNumbers(parsedNumbers);
 
         return parsedNumbers.stream().reduce(0, Integer::sum);
     }
@@ -69,6 +71,17 @@ public class Calculator {
                     .map(Integer::parseInt).collect(Collectors.toList());
         } catch (NumberFormatException ignored) {
             throw new InvalidNumberFormatException();
+        }
+    }
+
+    private void checkNegativeNumbers(List<Integer> parsedNumbers) {
+        Predicate<Integer> isNegative = x -> x < 0;
+        boolean hasNegatives = parsedNumbers.stream().anyMatch(isNegative);
+        if (hasNegatives) {
+            List<Integer> negatives = parsedNumbers.stream()
+                    .filter(isNegative)
+                    .collect(Collectors.toList());
+            throw new NegativeNumberException(negatives);
         }
     }
 }
