@@ -12,8 +12,8 @@ public class Calculator {
     private static final String DEFAULT_DELIMITER = ",";
     private static final String DELIMITER_SECTION_START = "//";
     public static final String DELIMITER_END = "\n";
-    private static final char MULTICHAR_DELIMITER_START = '[';
-    private static final char MULTICHAR_DELIMITER_END = ']';
+    private static final char BRACKETED_DELIMITER_START = '[';
+    private static final char BRACKETED_DELIMITER_END = ']';
     private static final int MAX_NUMBER = 1000;
 
     public int add(String numbers) {
@@ -49,19 +49,26 @@ public class Calculator {
 
     private String parseDelimiters(String delimiterSection) {
         String delimiterText = delimiterSection;
-        String delimiter = DEFAULT_DELIMITER;
+        List<String> delimiters = new ArrayList<>();
 
         if (delimiterText.startsWith(DELIMITER_SECTION_START)) {
             delimiterText = delimiterText.substring(DELIMITER_SECTION_START.length());
 
-            if (delimiterText.charAt(0) == MULTICHAR_DELIMITER_START) {
-                delimiter = parseBracketedDelimiter(delimiterText);
+            if (delimiterText.charAt(0) == BRACKETED_DELIMITER_START) {
+                do {
+                    delimiters.add(parseBracketedDelimiter(delimiterText));
+                    int endDelimiter = delimiterText.indexOf(BRACKETED_DELIMITER_END);
+                    delimiterText = delimiterText.substring(endDelimiter + 1);
+                } while (delimiterText.startsWith(String.valueOf(BRACKETED_DELIMITER_START)));
             } else {
-                delimiter = parseSingleCharacterDelimiter(delimiterText);
+                String delimiter = parseSingleCharacterDelimiter(delimiterText);
+                delimiters.add(delimiter);
             }
+        } else {
+            delimiters.add(DEFAULT_DELIMITER);
         }
 
-        return makeDelimiterRegex(delimiter);
+        return makeDelimiterRegex(delimiters);
     }
 
     private String parseSingleCharacterDelimiter(String delimiterText) {
@@ -71,12 +78,12 @@ public class Calculator {
 
     private String parseBracketedDelimiter(String delimiterText) {
         int startDelimiter = 1;
-        int endDelimiter = delimiterText.indexOf(MULTICHAR_DELIMITER_END);
+        int endDelimiter = delimiterText.indexOf(BRACKETED_DELIMITER_END);
         return delimiterText.substring(startDelimiter, endDelimiter);
     }
 
-    private String makeDelimiterRegex(String delimiter) {
-        return "\n" + "|\\Q" + delimiter + "\\E";
+    private String makeDelimiterRegex(List<String> delimiters) {
+        return "\n" + delimiters.stream().reduce("", (x, y) -> x + "|\\Q" + y + "\\E");
     }
 
     private List<Integer> parseNumbers(String body, String delimiterRegex) {

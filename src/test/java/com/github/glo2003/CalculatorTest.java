@@ -117,4 +117,12 @@ public class CalculatorTest {
 
         assertEquals(6, result);
     }
+
+    // Step 8
+    @Test
+    void whenMultipleDelimiters_thenReturnsSum() {
+        int result = calculator.add("//[*][%]\n1*2%3");
+
+        assertEquals(6, result);
+    }
 }
