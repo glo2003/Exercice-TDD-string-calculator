@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Calculator {
 
-    private static final String DEFAULT_DELIMITER = ",";
+    private static final String DELIMITERS = "[,\n]";
 
     public int add(String numbers) {
         if (numbers.isEmpty()) {
@@ -12,7 +12,7 @@ public class Calculator {
         }
 
         try {
-            return Arrays.stream(numbers.split(DEFAULT_DELIMITER))
+            return Arrays.stream(numbers.split(DELIMITERS))
                     .filter(s -> !s.isEmpty())
                     .map(Integer::parseInt)
                     .reduce(0, Integer::sum);

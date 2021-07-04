@@ -64,4 +64,19 @@ public class CalculatorTest {
 
         assertEquals(15, result);
     }
+
+    // Step 3
+    @Test
+    void whenNewLineSeparator_thenReturnsSum() {
+        int result = calculator.add("1\n2,3");
+
+        assertEquals(6, result);
+    }
+
+    @Test
+    void whenMissingNumberWithNewLine_thenIsValid() {
+        int result = calculator.add("1,\n");
+
+        assertEquals(1, result);
+    }
 }
