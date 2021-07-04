@@ -56,4 +56,12 @@ public class CalculatorTest {
         assertThrows(InvalidNumberFormatException.class,
                 () -> calculator.add("4,a"));
     }
+
+    // Step 2
+    @Test
+    void whenMultipleNumbers_thenReturnsSum() {
+        int result = calculator.add("1,2,3,4,5");
+
+        assertEquals(15, result);
+    }
 }
