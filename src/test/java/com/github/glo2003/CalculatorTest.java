@@ -79,4 +79,12 @@ public class CalculatorTest {
 
         assertEquals(1, result);
     }
+
+    // Step 4
+    @Test
+    void whenChangeDelimiter_thenReturnsSum() {
+        int result = calculator.add("//;\n1;2");
+
+        assertEquals(3, result);
+    }
 }
