@@ -109,4 +109,12 @@ public class CalculatorTest {
 
         assertEquals(1002, result);
     }
+
+    // Step 7
+    @Test
+    void whenMultiCharactersDelimiter_thenReturnsSum() {
+        int result = calculator.add("//[***]\n1***2***3");
+
+        assertEquals(6, result);
+    }
 }

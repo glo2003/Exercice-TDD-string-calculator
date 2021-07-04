@@ -12,6 +12,8 @@ public class Calculator {
     private static final String DEFAULT_DELIMITER = ",";
     private static final String DELIMITER_SECTION_START = "//";
     public static final String DELIMITER_END = "\n";
+    private static final char MULTICHAR_DELIMITER_START = '[';
+    private static final char MULTICHAR_DELIMITER_END = ']';
     private static final int MAX_NUMBER = 1000;
 
     public int add(String numbers) {
@@ -51,7 +53,12 @@ public class Calculator {
 
         if (delimiterText.startsWith(DELIMITER_SECTION_START)) {
             delimiterText = delimiterText.substring(DELIMITER_SECTION_START.length());
-            delimiter = parseSingleCharacterDelimiter(delimiterText);
+
+            if (delimiterText.charAt(0) == MULTICHAR_DELIMITER_START) {
+                delimiter = parseBracketedDelimiter(delimiterText);
+            } else {
+                delimiter = parseSingleCharacterDelimiter(delimiterText);
+            }
         }
 
         return makeDelimiterRegex(delimiter);
@@ -60,6 +67,12 @@ public class Calculator {
     private String parseSingleCharacterDelimiter(String delimiterText) {
         int endDelimiterSection = delimiterText.indexOf(DELIMITER_END);
         return delimiterText.substring(0, endDelimiterSection);
+    }
+
+    private String parseBracketedDelimiter(String delimiterText) {
+        int startDelimiter = 1;
+        int endDelimiter = delimiterText.indexOf(MULTICHAR_DELIMITER_END);
+        return delimiterText.substring(startDelimiter, endDelimiter);
     }
 
     private String makeDelimiterRegex(String delimiter) {
