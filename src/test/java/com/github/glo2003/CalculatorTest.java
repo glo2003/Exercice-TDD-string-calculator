@@ -125,4 +125,12 @@ public class CalculatorTest {
 
         assertEquals(6, result);
     }
+
+    // Step 9
+    @Test
+    void whenMultipleDelimitersOfArbitraryLength_thenReturnsSum() {
+        int result = calculator.add("//[***][+++]\n1***2+++3");
+
+        assertEquals(6, result);
+    }
 }
