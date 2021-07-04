@@ -15,11 +15,40 @@ public class CalculatorTest {
         calculator = new Calculator();
     }
 
+    // step 1
     @Test
     void whenEmptyString_thenReturnsZero() {
         int result = calculator.add("");
 
         assertEquals(0, result);
+    }
+
+    @Test
+    void whenOneNumber_thenReturnsThatNumber() {
+        int result = calculator.add("1");
+
+        assertEquals(1, result);
+    }
+
+    @Test
+    void whenTwoNumbers_thenReturnsSum() {
+        int result = calculator.add("1,2");
+
+        assertEquals(3, result);
+    }
+
+    @Test
+    void whenTrailingDelimiter_thenReturnsSum() {
+        int result = calculator.add("1,");
+
+        assertEquals(1, result);
+    }
+
+    @Test
+    void whenDuplicatedDelimiters_thenReturnsSum() {
+        int result = calculator.add("1,,2");
+
+        assertEquals(3, result);
     }
 
     @Test
