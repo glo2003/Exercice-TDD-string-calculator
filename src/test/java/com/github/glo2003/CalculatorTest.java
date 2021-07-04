@@ -94,4 +94,19 @@ public class CalculatorTest {
         assertThrows(NegativeNumberException.class,
                 () -> calculator.add("-1,2"));
     }
+
+    // Step 6
+    @Test
+    void whenGreaterThan1000_thenIsIgnored() {
+        int result = calculator.add("2,1001");
+
+        assertEquals(2, result);
+    }
+
+    @Test
+    void whenSmallerOrEqualTo1000_thenIsAdded() {
+        int result = calculator.add("2,1000");
+
+        assertEquals(1002, result);
+    }
 }

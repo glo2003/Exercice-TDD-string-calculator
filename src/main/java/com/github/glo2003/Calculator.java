@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Calculator {
 
     private static final String DEFAULT_DELIMITER = ",";
     private static final String DELIMITER_SECTION_START = "//";
     public static final String DELIMITER_END = "\n";
+    private static final int MAX_NUMBER = 1000;
 
     public int add(String numbers) {
         if (numbers.isEmpty()) {
@@ -26,7 +28,7 @@ public class Calculator {
         List<Integer> parsedNumbers = parseNumbers(body, delimiterRegex);
         checkNegativeNumbers(parsedNumbers);
 
-        return parsedNumbers.stream().reduce(0, Integer::sum);
+        return filterNumbers(parsedNumbers).reduce(0, Integer::sum);
     }
 
     private List<String> splitDelimiterSectionAndBody(String input) {
@@ -83,5 +85,10 @@ public class Calculator {
                     .collect(Collectors.toList());
             throw new NegativeNumberException(negatives);
         }
+    }
+
+    private Stream<Integer> filterNumbers(List<Integer> numbers) {
+        return numbers.stream()
+                .filter(x -> x <= MAX_NUMBER);
     }
 }
