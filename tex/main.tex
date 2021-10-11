@@ -1,0 +1,258 @@
+\documentclass[french]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage[numbers]{natbib}
+\usepackage{color,soul}
+\usepackage{listings}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Exercice de TDD},
+    pdfpagemode=FullScreen,
+    }
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+% Listing
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+ 
+\lstset{language=Java,
+    basicstyle=\ttfamily,
+    keywordstyle=\color{javapurple}\bfseries,
+    stringstyle=\color{javared},
+    commentstyle=\color{javagreen},
+    morecomment=[s][\color{javadocblue}]{/**}{*/},
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=2,
+    numbersep=10pt,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    numbers=none}
+
+\title{Exercice de TDD: String Calculator Kata}
+\author{GLO-2003: Introduction aux processus du génie logiciel}
+\date{Hiver 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Consignes}
+
+Le but de cet exercice est de mettre en pratique le Test Driven Development. En guise de rappel, voici les \guillemotleft Lois du TDD \guillemotright selon Robert C. Martin dans Clean Code\cite{martinClean} (traduction extraite de \href{https://www.wikiwand.com/fr/Test_driven_development}{Wikipedia}):
+
+\begin{enumerate}
+    \item Vous ne pouvez pas écrire de code de production tant que vous n'avez pas écrit un test unitaire qui échoue, c'est-à-dire qu'il n'est permis d'écrire du code de production que si un test unitaire est en échec.
+    \item Vous ne pouvez pas écrire plus d'un test unitaire que nécessaire pour échouer, et ne pas compiler revient à échouer, c'est-à-dire qu'il n'est permis d'écrire qu'un nouveau test unitaire en échec à la fois, et un test unitaire qui ne compile pas est déjà un test en échec.
+    \item Vous ne pouvez pas écrire plus de code de production que nécessaire pour que le test unitaire actuellement en échec réussisse, c'est-à-dire qu'il n'est permis d'écrire que du code de production permettant directement de faire passer le test unitaire précédent, ni plus ni moins.
+\end{enumerate}
+
+On préfère aussi des tests précis avec idéalement un seul \texttt{assert} par test afin de ne tester qu'un seul concept par test.
+
+Vous devez réaliser l'exercice une étape à la fois, sans regarder les étapes suivantes et en respectant les principes du TDD. Nous vous recommandons d'utiliser la structure \texttt{arrange-act-assert} pour organiser vos test, voir \href{http://wiki.c2.com/?ArrangeActAssert}{wiki.c2.com/?ArrangeActAssert} pour plus de détails.
+
+Cet exercice peut être réalisé seul ou en équipe de 2 à 3 personnes. Nous vous conseillons de réaliser l'exercise en \texttt{Pair Programming}. Nous vous recommandons aussi de créer un \texttt{repository} GitHub pour partager le code entre les membres de l'équipe et de faire un commit par étape. Vous pouvez utiliser le langage de votre choix, mais l'exercice doit être fait en TDD. Une solution sera proposée en Java sur le \texttt{repository} de l'exercise.
+
+Le code de base se trouve ici: \href{https://github.com/glo2003/Exercice-TDD-string-calculator}{glo2003/Exercice-TDD-string-calculator}
+
+\section{Conseils}
+
+Cet exercice demande de manipuler des chaînes de caractères. La fonction \texttt{String.split} pourrait vous être utile pour séparer une \texttt{String} selon un délimiteur. Ci dessous vous trouverez un exemple d'utilisation de \texttt{String.split} avec un \texttt{regex}.
+
+\texttt{,|\textbackslash Q***\textbackslash E} veut dire que l'on va séparer sur une virgule ou sur \texttt{***}. Vous pouvez consulter \href{https://www.regexplanet.com/support/javadoc.html}{regexplanet.com} pour plus de détails sur les \texttt{regex}. Un petit indice, vous pouvez construire un \texttt{regex} en concaténant des chaînes de caractères.
+
+\begin{lstlisting}
+String aString = "a***b,c";
+String[] split = aString.split(",|\\Q***\\E");
+\end{lstlisting}
+
+\noindent Les \texttt{Streams} Java pourraient aussi vous être utiles pour manipuler des listes.
+
+\begin{lstlisting}
+import java.util.List;
+
+List<Integer> xs = List.of(1, 2, 3, 4, 5, 6);
+int sum = xs.stream() // [1, 2, 3, 4, 5, 6]
+            // Ne conserve que les elements ou le predicat est vrai
+            .filter(x -> x % 2 == 0) // [2, 4, 6]
+            // Applique une fonction lambda sur tous les elements de la liste
+            .map(x -> x + 1) // [3, 5, 7]
+            // Combine tous les elements de la liste en sommant
+            .reduce(0, Integer::sum); // 0 + 3 + 5 + 7 = 15
+\end{lstlisting}
+
+\newpage
+\noindent Voici un exemple d'utilisation de JUnit5:
+\begin{lstlisting}
+package com.github.glo2003;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
+public class CalculatorTest {
+
+    Calculator calculator;
+
+    @BeforeEach
+    void setUp() {
+        calculator = new Calculator();
+    }
+    
+    @Test
+    void whenEmptyString_thenReturnsZero() {
+        int result = calculator.add("");
+
+        assertEquals(0, result);
+    }
+    
+    @Test
+    void whenNonNumericValues_thenThrowInvalidInput() {
+        assertThrows(InvalidNumberFormatException.class,
+                () -> calculator.add("4,a"));
+    }
+
+}
+\end{lstlisting}
+
+\newpage
+\section{Kata}
+Le but de ce kata est de concevoir une calculatrice calculant la somme de nombres passés dans une chaîne de caractères. Ce kata est inspiré du \texttt{String Calculator Kata} de Kata-Log\cite{stringKata}. Le code de base se trouve ici: \href{https://github.com/glo2003/Exercice-TDD-string-calculator}{glo2003/Exercice-TDD-string-calculator}. Nous vous conseillons de faire un commit par étape complétée.
+
+\subsection{Étape 1}
+Vous devez ajouter une méthode avec la signature suivante à la classe \texttt{Calculator}:
+
+\begin{lstlisting}
+int add(String numbers)
+\end{lstlisting}
+
+Cette méthode doit pouvoir additionner jusqu'à deux entiers séparés par une virgule. Si les entrées sont ne sont pas des entiers, lancez une exception de type \texttt{InvalidNumberFormatException}. Les doubles délimiteurs (\texttt{1,,3}) doivent simplement être ignorés. La table \ref{tab:input-step1} détaille quelques entrées et sorties attendues.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Entrée} & \textbf{Sortie attendue} \\\hline\hline
+        \texttt{""}     & \texttt{0} \\\hline
+        \texttt{"1"}    & \texttt{1} \\\hline
+        \texttt{"1,2"}  & \texttt{3} \\\hline
+        \texttt{"1,"}   & \texttt{1} \\\hline
+        \texttt{"1,,3"} & \texttt{4} \\\hline
+        \texttt{"4,a"}  & \texttt{InvalidNumberFormatException} \\\hline
+    \end{tabular}
+    \caption{Entrées et sorties attendues à l'étape 1}
+    \label{tab:input-step1}
+\end{table}
+
+\subsection{Étape 2}
+Vous devez modifier la méthode \texttt{add} afin de pouvoir additionner un nombre arbitraire d'entiers séparés par des virgules. La table \ref{tab:input-step2} détaille quelques entrées et sorties attendues.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Entrée}      & \textbf{Sortie attendue} \\\hline\hline
+        \texttt{"1,2,3"}     & \texttt{6} \\\hline
+        \texttt{"1,2,3,4,5"} & \texttt{15} \\\hline
+    \end{tabular}
+    \caption{Entrées et sorties attendues à l'étape 2}
+    \label{tab:input-step2}
+\end{table}
+
+\subsection{Étape 3}
+Modifiez la méthode \texttt{add} afin de permettre l'utilisation de \texttt{newlines} (\texttt{\textbackslash n}) entre les nombres plutôt que des virgules. En bref, il doit maintenant être possible de séparer les nombres par des virgules ou des \texttt{\textbackslash n}, ou les deux. La table \ref{tab:input-step3} détaille quelques entrées et sorties attendues.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Entrée} & \textbf{Sortie attendue} \\\hline\hline
+        \texttt{"1\textbackslash n2,3"} & \texttt{6} \\\hline
+        \texttt{"1,\textbackslash n"}   & \texttt{1} \\\hline
+    \end{tabular}
+    \caption{Entrées et sorties attendues à l'étape 3}
+    \label{tab:input-step3}
+\end{table}
+
+\subsection{Étape 4}
+Vous devez modifier \texttt{add} afin de pouvoir changer, de façon optionnelle, le délimiteur entre les nombres selon la chaîne de caractères reçue. Voici le format attendu:
+
+\begin{lstlisting}
+"//[delimiter]\n[numbers...]"
+\end{lstlisting}
+
+où \texttt{[delimiter]} est un caractère représentant le nouveau délimiteur et \texttt{[numbers...]} est une liste de nombres séparée par \texttt{[delimiter]}. Ainsi, si l'entrée commence par le format précédent, les entiers doivent être séparés par \texttt{[delimiter]} ou par des \texttt{\textbackslash n}.
+
+L'exemple suivant devrait retourner 6.
+
+\begin{lstlisting}
+"//;\n1;2\n3"
+\end{lstlisting}
+
+Il est à noter que la première ligne (\texttt{//[delimiter]\textbackslash n}) est optionnelle, les exemples des étapes précédentes doivent encore fonctionner.
+
+\subsection{Étape 5}
+Modifiez \texttt{add} afin que la méthode lance une exception de type \texttt{NegativeNumberException} si au moins un nombre négatif est passé à la méthode.
+
+\subsection{Étape 6}
+Modifiez la méthode \texttt{add} afin qu'elle ignore les nombres supérieurs à \texttt{1000}. Ainsi, \texttt{2 + 1001 = 2}, mais \texttt{2 + 1000 = 1002}.
+
+\subsection{Étape 7}
+Modifiez \texttt{add} afin de supporter des délimiteurs de longueur arbitraire (au moins un caractère) selon le format:
+
+\begin{lstlisting}
+"//[delimiter]\n[numbers...]"
+\end{lstlisting}
+
+L'exemple suivant devrait retourner 6.
+
+\begin{lstlisting}
+"//[***]\n1***2***3"
+\end{lstlisting}
+
+\subsection{Étape 8}
+Modifiez \texttt{add} afin de permettre plusieurs délimiteurs selon le format suivant:
+
+\begin{lstlisting}
+"//[delim1][delim2]\n[numbers...]"
+\end{lstlisting}
+
+L'exemple suivant devrait retourner 6.
+
+\begin{lstlisting}
+"//[*][%]\n1*2%3"
+\end{lstlisting}
+
+\subsection{Étape 9}
+Finalement, assurez-vous qu'il est possible d'utiliser plusieurs délimiteurs de longueur arbitraire.
+
+L'exemple suivant devrait retourner 6.
+
+\begin{lstlisting}
+"//[***][%%%]\n1***2%%%3"
+\end{lstlisting}
+
+\section{Solution}
+La solution de cet exercice se trouve sur \href{https://github.com/glo2003/Exercice-TDD-string-calculator}{glo2003/Exercice-TDD-string-calculator}. Il y a une branche par étape de la solution.
+
+\bibliographystyle{plainnat}
+\bibliography{citations}
+
+\end{document}
